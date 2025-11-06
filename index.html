@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demande d'Items</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 100%;
+      backdrop-filter: blur(10px);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      color: #667eea;
+      font-size: 32px;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .header p {
+      color: #666;
+      font-size: 16px;
+    }
+
+    .icon {
+      font-size: 60px;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      color: #333;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 150px;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      margin-bottom: 25px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .checkbox-group:hover {
+      background: #e9ecef;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-right: 12px;
+      cursor: pointer;
+      accent-color: #667eea;
+    }
+
+    .checkbox-group label {
+      margin: 0;
+      cursor: pointer;
+      text-transform: none;
+      letter-spacing: normal;
+      font-weight: 500;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .submit-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .message {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: 600;
+      display: none;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.success {
+      background: #d4edda;
+      color: #155724;
+      border: 2px solid #c3e6cb;
+    }
+
+    .message.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 2px solid #f5c6cb;
+    }
+
+    /* --- Modal des conditions --- */
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      max-width: 600px;
+      width: 90%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      text-align: left;
+      overflow-y: auto;
+      max-height: 80vh;
+    }
+
+    .modal-content h2 {
+      color: #667eea;
+      margin-bottom: 15px;
+    }
+
+    .modal-content p {
+      color: #333;
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+
+    .modal-btn {
+      display: block;
+      margin: 20px auto 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .modal-btn:hover {
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <!-- Fenêtre modale des conditions -->
+  <div id="termsModal" class="modal">
+    <div class="modal-content">
+      <h2>Conditions d'utilisation</h2>
+      <p>Bienvenue sur notre page de demande d'items.</p>
+      <p>Avant d'utiliser ce service, vous devez accepter les conditions suivantes :</p>
+      <ul>
+        <li>1️⃣ Les informations que vous soumettez seront envoyées sur notre serveur Discord via un webhook.</li>
+        <li>2️⃣ En cliquant sur "J'accepte", vous consentez à ce que votre nom et votre demande soient transmis.</li>
+        <li>3️⃣ Aucune donnée sensible ne doit être envoyée via ce formulaire.</li>
+        <li>4️⃣ Toute utilisation abusive entraînera un blocage d'accès.</li>
+      </ul>
+      <p>En cliquant sur “J’accepte”, votre demande pourra être envoyée sur Discord lorsque vous remplirez le formulaire.</p>
+      <button class="modal-btn" id="acceptBtn">J'accepte les conditions</button>
+    </div>
+  </div>
+
+  <!-- Contenu principal -->
+  <div class="container" id="mainContent" style="display:none;">
+    <div class="header">
+      <div class="icon">🎁</div>
+      <h1>Demande d'Items</h1>
+      <p>Faites votre demande et nous vous contacterons</p>
+    </div>
+
+    <form id="requestForm">
+      <div class="form-group">
+        <label for="username">👤 Votre Nom</label>
+        <input type="text" id="username" placeholder="Entrez votre nom" required>
+      </div>
+
+      <div class="form-group">
+        <label for="request">🔍 Entrez votre demande de l'objet</label>
+        <textarea id="request" placeholder="Décrivez l'objet que vous recherchez..." required></textarea>
+      </div>
+
+      <div class="checkbox-group" onclick="document.getElementById('acceptTerms').click()">
+        <input type="checkbox" id="acceptTerms" required>
+        <label for="acceptTerms">J'accepte les conditions d'utilisation</label>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">Envoyer la Demande</button>
+    </form>
+
+    <div id="message" class="message"></div>
+  </div>
+
+  <script>
+    const modal = document.getElementById('termsModal');
+    const acceptBtn = document.getElementById('acceptBtn');
+    const mainContent = document.getElementById('mainContent');
+
+    acceptBtn.addEventListener('click', () => {
+      modal.style.display = 'none';
+      mainContent.style.display = 'block';
+    });
+
+    const form = document.getElementById('requestForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const messageDiv = document.getElementById('message');
+
+    const WEBHOOK_URL = "https://discord.com/api/webhooks/1436004014205435948/zattC18xncDP_TQPEqd0O19sS20tRBqCNHiFS46caRTamy0waYIl9zzVoTdIpl-topkh";
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      if (!document.getElementById('acceptTerms').checked) {
+        showMessage('❌ Vous devez accepter les conditions d\'utilisation.', 'error');
+        return;
+      }
+
+      const username = document.getElementById('username').value.trim();
+      const request = document.getElementById('request').value.trim();
+
+      if (!username || !request) {
+        showMessage('❌ Tous les champs doivent être remplis.', 'error');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Envoi en cours...";
+
+      const embed = {
+        title: "🎁 Nouvelle Demande d'Item",
+        color: 6733050,
+        fields: [
+          { name: "👤 Demandeur", value: username },
+          { name: "🔍 Demande", value: request }
+        ],
+        footer: { text: "Système de Demande d'Items" },
+        timestamp: new Date().toISOString()
+      };
+
+      const payload = {
+        username: "Bot Demandes",
+        avatar_url: "https://cdn-icons-png.flaticon.com/512/2917/2917995.png",
+        content: "Nouvelle demande reçue !", // message normal sans mention globale
+        embeds: [embed]
+      };
+
+      try {
+        const response = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+          showMessage('✅ Demande envoyée avec succès !', 'success');
+          form.reset();
+        } else {
+          showMessage('❌ Erreur lors de l\'envoi.', 'error');
+        }
+      } catch (err) {
+        showMessage('❌ Une erreur est survenue.', 'error');
+        console.error(err);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Envoyer la Demande";
+      }
+    });
+
+    function showMessage(text, type) {
+      messageDiv.textContent = text;
+      messageDiv.className = `message ${type}`;
+      messageDiv.style.display = 'block';
+      setTimeout(() => { messageDiv.style.display = 'none'; }, 5000);
+    }
+  </script>
+</body>
+</html>
